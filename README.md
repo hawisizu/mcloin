@@ -144,8 +144,6 @@ def check_all_communes():
     for row_index, commune in df.iterrows():
         progress = str(row_index + 1).zfill(5) + " / " + str(df.shape[0])
 
-        problem=None
-
         if not isfloat(commune['latitude']) or not isfloat(commune['longitude']) or \
             math.isnan(float(commune['latitude'])) or math.isnan(float(commune['longitude'])):
             logging.info(progress + ": No Lat / Long info for commmune: " + commune['nom_commune'])
@@ -170,8 +168,6 @@ def check_all_communes():
                 furthest_commune_name = commune['nom_commune']
                 furthest_commune_closest_mc_id = closest_mc_id
 
-
-
     logging.info("Commune further away from any McDo: " + furthest_commune_name + ", which is " + str(furthest_commune_dist) + " km away from Mc Do: " + mc_list[furthest_commune_closest_mc_id]["name"])
 
     with open("communes.json", 'w') as outfile:
@@ -182,4 +178,4 @@ def check_all_communes():
 
 ## Next Steps
 * trying to find really the furthest point, instead of calculating the furthest from the all teh center of cities. But this is a bit more challenging, I have to find strategies here, as taking a point each 100 m seems unscalable. 
-* make a beautiful map with colours. I know, this has been done already, but as said, this is more an exercice for me than anything else. 
+* make a beautiful map with colours now that we have all the cities with the distances. I know, this has been done already, but as said, this is more an exercice for me than anything else. 
