@@ -3,11 +3,14 @@
 This is the french equivalent of the McFurthest point, the point furthest away from a McDonald. The rest will be in French!
 
 
-## Intro
+## Intro and result
 Tout part de ce twitt 
 https://twitter.com/JulesGrandin/status/1108404221790093325
 
 et du fait que je cherche des petits projets pour me faire la main sur de la manip de données géographiques. 
+
+### Result: 
+The city in France furthest from any McDonald restaurant is: **Châteauneuf-d'Entraunes**, which is 50.235 km away from: McDonald's GATTIERES
 
 Donc je vois trois étapes
 
