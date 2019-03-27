@@ -1,32 +1,36 @@
 # mcloin
 
-This is the french equivalent of the McFurthest point, the point furthest away from a McDonald. The rest will be in French!
+This is the french equivalent of the McFurthest point, the point furthest away from a McDonald. 
+Loin means far in French, so McFurthest = McLoin. 
 
 
 ## Intro and result
-Tout part de ce twitt 
+Everything starts from this french twit 
 https://twitter.com/JulesGrandin/status/1108404221790093325
 
-et du fait que je cherche des petits projets pour me faire la main sur de la manip de données géographiques. 
+complaining about no one having calculated the McFurthest point of France. 
+And also from the fact that I want to make some tiny side projects to work on geo data. So this seemed a good excercise.  
+
+I see 3 steps
+
+1. Find the list of McDonalds in France (the McList)
+1. Make a function that gives the close McDo from a given location
+1. Find the McLoin point. 
 
 ### Result: 
-The city in France furthest from any McDonald restaurant is: **Châteauneuf-d'Entraunes**, which is 50.235 km away from: McDonald's GATTIERES
+The city in France furthest away from any McDonald restaurant is: **Châteauneuf-d'Entraunes**, which is 50.235 km away from: McDonald's GATTIERES
 
-Donc je vois trois étapes
 
-1. Trouver la liste des mcdos
-1. Faire une fonction qui calcule la distance au mac do le plus proche
-1. Trouver le point Mc Loin
 
-## Trouver la liste des mcdos. 
-Mappy à une carte 
+## Get the McList 
+Mappy has got a Map that seems easy to scrap
 https://fr.mappy.com/app/mcdonalds#/15/M2/Tmcdonalds/N151.12061,6.11309,0.53541,46.35344/Z5/
 
-Quand on bouge la carte, on voit qu’une requête est faite: 
+With the chrome dev tools, we can easily see that a request is done to: 
 
 https://uws2.mappy.net/data/poi/5.3/applications/mcdonalds?bbox=45.058001435398296,-21.884765625,47.60616304386874,22.939453125&max=100
 
-Ou on voit bien 2 points, chacun avec lat et long, qui définissent un rectangle, et une quantité max de résultat. 
+Params are easy to understand: 2 points defined by lat & long, defining a square, and a result cap. 
 
 On peut donc rapidement faire une fonction qui donne tous les mcdos d’un carré données par deux points. 
 
@@ -54,14 +58,13 @@ def import_mc_list_from_square(lat1,lng1,lat2,lng2):
                 logging.debug("mc id already known: "+ mc_id)
 ```
 
-Mappy renvoie aussi un ID de chez eux, qu'on va utiliser pour être sur qu'on importe pas deux fois le même. Je garde les résultats dans une variable `mc_list`. 
+Mappy's API also gives us their own ID, which I use to make sure each shop is imported only once. 
+I store the results in a global variable `mc_list`. 
 
-Malheureusement, même si on met 1000 en max, la requête ne renvoie jamais plus de 500 McDo. 
-On ne peut donc pas faire une requête qui importe tous les McDo de France continentale d’un coup. 
-Il faut donc faire une fonction qui découpe la France en petit carrés et qui importe les McDos de cette zone, en vérifiant qu'on importe jamais plus de 500 McDos à la fois
+Sadly, even when passing 10000 as max, we never get more than 500 results. So we cannot import all french restaurant in one request. 
+We need a function parsing France, tiny square by tiny square, and we should check that the number of imported restaurant is always below 500.
 
-
-J'ai fait une méthode qui importe les McDos d'un carré de 1 x 1 de lat / long. Il reste plus qu'à parcourir toute la france. En prenant large: 
+So I simply made a method taking a big square, then querying restaurants for all the tiny squares of 1 x 1 within the bounds. Lots of these tiny squares are in the sea, but this is not a problem, Mappy simply returns 0 for those. 
 
 ![France](https://www.evernote.com/shard/s517/sh/97d97f2a-0333-4664-818a-91299efcac4d/899bf07a9af0a269/res/6d039011-6f77-4cf3-ae8a-6ba8ecd89fd0/skitch.png)
 
@@ -76,15 +79,13 @@ def import_them_all(min_lat, max_lat, min_lng, max_lng):
 import_them_all(41,52,-5,9)
 ```
 
-Je vois dans les logs qu'on importe jamais plus de 500 McDo à chaque fois. Au total on en importe 1450, ce qui est cohérent avec ce que dit google. 
+I see in the logs that we are always below 500. In total 1480 restuarants are imported, which seems coherent with what I see on google. 
 
-## Calculer la distance
-Pas le plus dur. On trouve très facilement sure le web des exemples de comment calculer des distances à partir de deux points. 
-
-J'ai d'abord fait: 
+## Calculating distances
+Not so hard really: a lot of online examples are really helpful. 
+I started by using geopy: 
 
 ```python
-
 from geopy.distance import geodesic
 
 #location is a tuple (lat,lng)
@@ -101,9 +102,9 @@ def closest_mc_donald(location):
     logging.info("[geodesic] Closest McDo from " + str(location) + " is " + mc_list[closest_mc_id]["name"] + ", at " + str(min_dist_geo) + " km.")
 ```
 
-Ce qui marche. Par contre c'est trop lent. Il faut une demi seconde pour comparer un point au 1450 mcdos. 
+Which works fine, but is slow. It was taking half a second to compare a location to 1480 McDonalds. 
 
-En cherchant un peu, j'ai trouvé sur StackOverflow une très bonne approximation qui ramène à quleques ms le temps de cacul: 
+Looking a big further, I fond on StackOverflow a very nice and very fast approximation which makes the same in about 2 or 3 ms. 
 
 ```python
 def haversine(lon1, lat1, lon2, lat2):
@@ -119,8 +120,7 @@ def haversine(lon1, lat1, lon2, lat2):
     return km
 ```
 
-Ce qui ne change que la ligne de calcul de la distance dans la fonction du dessus. 
-
+In the above function, only the line of the distance calculation changes. 
 
 ## Find the McFurthest point
 I am a bit unsure what is the best strategy here, so I though that I could first start by taking each city of France (commune), whose lat / lng should be easy to find, then find which of these was the farthest away from a McDonald restaurant. 
