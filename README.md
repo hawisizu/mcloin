@@ -179,3 +179,7 @@ def check_all_communes():
 ## Next Steps
 * trying to find really the furthest point, instead of calculating the furthest from the all teh center of cities. But this is a bit more challenging, I have to find strategies here, as taking a point each 100 m seems unscalable. 
 * make a beautiful map with colours now that we have all the cities with the distances. I know, this has been done already, but as said, this is more an exercice for me than anything else. 
+
+## Making a nice map out of it
+See here: 
+https://observablehq.com/@hawisizu/france-mcfurthest-city
