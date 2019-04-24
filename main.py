@@ -193,11 +193,9 @@ if __name__ == '__main__':
             json.dump(mc_list, outfile, indent=2)
         logging.info(str(len(mc_list)) + " Mc Donalds loaded from web, and saved to local file")
 
-    list = find_5_closest_mc_donalds((46.3667,2.51667))
 
-    logging.info(list)
 
-    # check_all_communes()
+    check_all_communes()
 
     # import_go2poi_mc_list()
 
